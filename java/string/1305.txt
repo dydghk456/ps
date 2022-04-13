@@ -1,0 +1,47 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+
+public class Main {
+    public static int n;
+    public static int[] k;
+    public static String p;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in;
+        n = Integer.parseInt(br.readLine());
+        p = br.readLine();
+        k = new int[p.length()];
+        f();
+        int ans = p.length()-k[p.length()-1];
+        bw.write(ans+"\n");
+
+        bw.flush();
+
+
+    }
+
+    public static void solve(){
+
+    }
+    public static void f(){
+        int j = 0;
+        for(int i=1; i<p.length(); i++){
+            while(j>0 && p.charAt(i)!=p.charAt(j)){
+                j = k[j-1];
+            }
+
+            if(p.charAt(i)==p.charAt(j))
+                k[i] = ++j;
+        }
+    }
+
+}

@@ -1,0 +1,72 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+public class Main {
+    public static int n, k,m,start,end,where;
+    public static long prev, now;
+    public static long[] min,max, w;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] in = br.readLine().split(" ");
+        n = Integer.parseInt(in[0]);
+        m = Integer.parseInt(in[1]);
+
+        w = new long[n+1];
+        min = new long[4*n];
+        max = new long[4*n];
+        for(int i=1; i<=n; i++)
+            w[i] = Long.parseLong(br.readLine());
+
+        makeminTree(1,n,1);
+        makemaxTree(1,n,1);
+
+        for(int i=0; i<m; i++){
+            in = br.readLine().split(" ");
+            start = Integer.parseInt(in[0]);
+            end = Integer.parseInt(in[1]);
+            bw.write(getMin(1,n,1)+" "+getMax(1,n,1)+"\n");
+
+        }
+
+        bw.flush();
+
+    }
+
+    public static void solve(int idx, boolean value) {
+    }
+
+    public static long makeminTree(int l, int r, int idx){
+        if(l==r) return min[idx] = w[l];
+        int mid = (l+r)/2;
+        return min[idx]= Math.min(makeminTree(l,mid,2*idx),makeminTree(mid+1,r,2*idx+1));
+    }
+
+    public static long makemaxTree(int l, int r, int idx){
+        if(l==r) return max[idx] = w[l];
+        int mid = (l+r)/2;
+        return max[idx]= Math.max(makemaxTree(l,mid,2*idx),makemaxTree(mid+1,r,2*idx+1));
+    }
+
+    public static long getMin(int l, int r, int idx){
+        if(start>r || end<l) return Long.MAX_VALUE;
+        if(start<=l && end>=r) return min[idx];
+        int mid = (l+r)/2;
+        return Math.min(getMin(l,mid,2*idx),getMin(mid+1,r,2*idx+1));
+    }
+
+    public static long getMax(int l, int r, int idx){
+        if(start>r || end<l) return 0;
+        if(start<=l && end>=r) return max[idx];
+        int mid = (l+r)/2;
+        return Math.max(getMax(l,mid,2*idx),getMax(mid+1,r,2*idx+1));
+    }
+
+
+}

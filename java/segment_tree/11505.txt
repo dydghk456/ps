@@ -1,0 +1,79 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+public class Main {
+    public static int n, k,m,start,end,where;
+    public static long prev, now, mod =  1000000007;
+    public static long[] dp, w;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] in = br.readLine().split(" ");
+        n = Integer.parseInt(in[0]);
+        m = Integer.parseInt(in[1]);
+        k = Integer.parseInt(in[2]);
+
+        w = new long[n+1];
+        dp = new long[4*n];
+        for(int i=1; i<=n; i++)
+            w[i] = Long.parseLong(br.readLine());
+
+        makeTree(1,n,1);
+
+        for(int i=0; i<m+k; i++){
+            in = br.readLine().split(" ");
+            int op = Integer.parseInt(in[0]);
+            int a = Integer.parseInt(in[1]);
+            long b = Long.parseLong(in[2]);
+            if(op==1){
+                where = a;
+                now = b;
+                prev=w[a];
+                w[a] = b;
+                changeTree(1,n,1);
+            }
+            else if(op==2) {
+                start = a;
+                end = (int)b;
+                bw.write(getSum(1, n, 1) + "\n");
+            }
+        }
+
+        bw.flush();
+
+    }
+
+    public static void solve(int idx, boolean value) {
+    }
+
+    public static long makeTree(int l, int r, int idx){
+        if(l==r) return dp[idx] = w[l]%mod;
+        int mid = (l+r)/2;
+        return dp[idx]= makeTree(l,mid,2*idx)*makeTree(mid+1,r,2*idx+1)%mod;
+    }
+
+    public static long getSum(int l, int r, int idx){
+        if(start>r || end<l) return 1;
+        if(start<=l && end>=r) return dp[idx];
+        int mid = (l+r)/2;
+        return getSum(l,mid,2*idx)*getSum(mid+1,r,2*idx+1)%mod;
+    }
+
+    public static long changeTree(int l, int r, int idx){
+        if(where<l || where>r) return dp[idx];
+        if(l==r) return dp[idx] = now;
+        int mid = (l+r)/2;
+        long lv = dp[2*idx];
+        long rv = dp[2*idx+1];
+        if(where<=mid) lv = changeTree(l,mid,2*idx);
+        else rv = changeTree(mid+1,r,2*idx+1);
+        return dp[idx] = lv*rv%mod;
+    }
+
+}

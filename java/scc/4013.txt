@@ -1,0 +1,134 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+public class Main {
+    public static int n, k, cnt, res_cnt, start,s,p;
+    public static int[] count, scc,w;
+    public static long[] dp, sw;
+    public static ArrayList<Integer>[] d, ds;
+    public static Stack<Integer> st;
+    public static boolean[] visited;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in = br.readLine().split(" ");
+
+        n = Integer.parseInt(in[0]);
+        k = Integer.parseInt(in[1]);
+        cnt = 0;
+        res_cnt = 0;
+
+        count = new int[n + 1];
+        visited = new boolean[n + 1];
+        st = new Stack<Integer>();
+        scc = new int[n + 1];
+        d = new ArrayList[n + 1];
+        for (int i = 0; i <= n; i++) {
+            d[i] = new ArrayList<Integer>();
+        }
+
+        for (int i = 0; i < k; i++) {
+            in = br.readLine().split(" ");
+            int a = Integer.parseInt(in[0]);
+            int b = Integer.parseInt(in[1]);
+            d[a].add(b);
+        }
+
+        w = new int[n+1];
+        for(int i=1;i<=n; i++)
+            w[i] = Integer.parseInt(br.readLine());
+
+        in = br.readLine().split(" ");
+        s = Integer.parseInt(in[0]);
+        p = Integer.parseInt(in[1]);
+        sw = new long[n+1];
+
+        dfs(s);
+
+
+        start = scc[s];
+
+        ds = new ArrayList[res_cnt+1];
+        for (int i = 0; i <= res_cnt; i++) {
+            ds[i] = new ArrayList<Integer>();
+        }
+
+        Queue<Integer> q = new LinkedList<Integer>();
+        q.add(s);
+        Arrays.fill(visited,false);
+        while(!q.isEmpty()){
+            int l = q.poll();
+            visited[l] = true;
+            for(int r : d[l]){
+                if(scc[r]!=scc[l]) ds[scc[l]].add(scc[r]);
+                if(!visited[r]) q.add(r);
+            }
+        }
+
+        dp = new long[res_cnt+1];
+        dp[start] = sw[start];
+        q.add(start);
+        while(!q.isEmpty()){
+          int now = q.poll();
+          for(int next:ds[now]){
+              if(dp[next]<dp[now]+sw[next]){
+                  dp[next] = dp[now]+sw[next];
+                  q.add(next);
+              }
+          }
+        }
+
+        in = br.readLine().split(" ");
+        long ans = 0;
+
+        for(int i=0; i<p; i++){
+            int res = Integer.parseInt(in[i]);
+            ans = Math.max(ans,dp[scc[res]]);
+        }
+
+
+
+        bw.write(ans+"\n");
+
+
+        bw.flush();
+
+
+    }
+
+    public static void solve(int idx) {
+
+    }
+    public static int dfs(int x) {
+        st.push(x);
+        count[x] = ++cnt;
+        int t = cnt;
+        visited[x] = true;
+
+        for(int v : d[x]){
+            if(!visited[v]) t = Math.min(t, dfs(v));
+            else if(scc[v]==0) t = Math.min(t, count[v]);
+        }
+
+        if(t==count[x]){
+            res_cnt++;
+            while(!st.isEmpty()){
+                int tt = st.pop();
+                scc[tt] = res_cnt;
+                sw[res_cnt] += w[tt];
+                if(tt == x) break;
+            }
+
+        }
+        return t;
+
+    }
+
+}

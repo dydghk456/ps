@@ -1,0 +1,119 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+public class Main {
+    public static int n, k, cnt, res_cnt, ans=1;
+    public static int[] count, scc, vres;
+    public static ArrayList<Integer>[] d, ss;
+    public static Stack<Integer> st;
+    public static boolean[] visited;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] in;
+        String first ="";
+        while((first = br.readLine()) != null && !first.equals("")) {
+            in = first.split(" ");
+
+            n = Integer.parseInt(in[0]);
+            k = Integer.parseInt(in[1]);
+            cnt = 0;
+            res_cnt = 0;
+            ans=1;
+
+            count = new int[2 * n + 1];
+            visited = new boolean[2 * n + 1];
+            st = new Stack<Integer>();
+            scc = new int[2 * n + 1];
+            d = new ArrayList[2 * n + 1];
+            ss = new ArrayList[2 * n + 1];
+            for (int i = 0; i <= 2 * n; i++) {
+                d[i] = new ArrayList<Integer>();
+                ss[i] = new ArrayList<Integer>();
+            }
+
+            for (int i = 0; i < k; i++) {
+                in = br.readLine().split(" ");
+                int a = Integer.parseInt(in[0]);
+                int b = Integer.parseInt(in[1]);
+                if (a < 0) a = n - a;
+                if (b < 0) b = n - b;
+                int na;
+                int nb;
+                if (a > n) na = a - n;
+                else na = a + n;
+                if (b > n) nb = b - n;
+                else nb = b + n;
+                d[na].add(b);
+                d[nb].add(a);
+            }
+
+            for (int i = 1; i <= 2 * n; i++)
+                if (!visited[i]) {
+                    dfs(i);
+                }
+
+            for (int i = 1; i <= n; i++) {
+                if (scc[i] == scc[n + i]) {
+                    ans = 0;
+                    break;
+                }
+            }
+
+            if (ans == 0) {
+                bw.write("no\n");
+                continue;
+            }
+
+            vres = new int[n + 1];
+            for (int i = res_cnt; i >= 1; i--) {
+                for (int item : ss[i]) {
+                    int val;
+                    if (item > n) val = 2;
+                    else val = 1;
+                    if (vres[(item - 1) % n] != 0) continue;
+                    vres[(item - 1) % n] = val;
+                }
+            }
+            if(vres[0]==2) bw.write("yes\n");
+            else bw.write("no\n");
+        }
+        bw.flush();
+
+    }
+
+    public static void solve(int idx, boolean value) {
+    }
+    public static int dfs(int x) {
+        st.push(x);
+        count[x] = ++cnt;
+        int t = cnt;
+        visited[x] = true;
+
+        for(int v : d[x]){
+            if(!visited[v]) t = Math.min(t, dfs(v));
+            else if(scc[v]==0) t = Math.min(t, count[v]);
+        }
+
+        if(t==count[x]){
+            res_cnt++;
+            ArrayList<Integer> temp = new ArrayList<Integer>();
+            while(!st.isEmpty()){
+                int tt = st.pop();
+                scc[tt] = res_cnt;
+                temp.add(tt);
+                if(tt == x) break;
+            }
+            ss[res_cnt] = temp;
+        }
+        return t;
+
+    }
+
+}

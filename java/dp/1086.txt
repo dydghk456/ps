@@ -1,0 +1,92 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+
+public class Main {
+    public static int n,k;
+    public static int[][] rest_dp;
+    public static long[][] dp;
+    public static String[] num;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in;
+
+        n = Integer.parseInt(br.readLine());
+        num = new String[n];
+
+        for(int i=0; i<n; i++) {
+            num[i] = br.readLine();
+        }
+
+        k= Integer.parseInt(br.readLine());
+        dp = new long[k][1<<n];
+        rest_dp = new int[n][k];
+        for(int i=0; i<k; i++)
+            Arrays.fill(dp[i],-1);
+        for(int i=0; i<n; i++)
+            Arrays.fill(rest_dp[i],-1);
+
+        long ans = solve(0,0);
+        long fact = 1;
+        for(int i=1; i<=n; i++)
+            fact *= i;
+
+        long a = fact;
+        long b = ans;
+
+        while(b!=0){
+            long t = a%b;
+            a = b;
+            b = t;
+        }
+        long gcd = a;
+
+        bw.write((ans/gcd)+"/"+(fact/gcd)+"\n");
+
+
+        bw.flush();
+
+
+    }
+
+    public static long solve(int rest, int visited){
+        if(visited == (1<<n)-1){
+            if(rest==0) return 1;
+            else return 0;
+        }
+
+        if(dp[rest][visited]!=-1) return dp[rest][visited];
+
+        long ans = 0;
+
+        for(int i=0; i<n; i++){
+
+            if((visited & (1<<i)) !=0) continue;
+
+            ans += solve(get_rest(i,rest), visited|(1<<i));
+        }
+        return dp[rest][visited] = ans;
+
+    }
+
+    public static int get_rest(int idx, int prev){
+        if(rest_dp[idx][prev]!=-1) return rest_dp[idx][prev];
+        int temp = prev;
+
+        for(int i=0; i<num[idx].length();i++){
+            int t = num[idx].charAt(i)-'0';
+            temp = temp*10+t;
+            temp %= k;
+        }
+        return rest_dp[idx][prev] = temp;
+    }
+
+}

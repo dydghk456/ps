@@ -1,0 +1,60 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+
+public class Main {
+    public static int n;
+    public static int[][] w, dp;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in;
+
+        n = Integer.parseInt(br.readLine());
+        dp = new int[n][1<<16];
+        w = new int[n][n];
+
+        for(int i=0; i<n; i++) {
+            Arrays.fill(dp[i],-1);
+            in = br.readLine().split(" ");
+            for (int j = 0; j < n; j++)
+                w[i][j] = Integer.parseInt(in[j]);
+        }
+
+        bw.write(solve(0,1)+"\n");
+
+        bw.flush();
+
+
+    }
+
+    public static int solve(int idx, int visited){
+        if(visited == (1<<n)-1){
+            if(w[idx][0]==0) return dp[idx][visited] = Integer.MAX_VALUE;
+            else return dp[idx][visited] = w[idx][0];
+        }
+
+        if(dp[idx][visited]!=-1) return dp[idx][visited];
+
+        int ans = Integer.MAX_VALUE;
+
+        for(int i=0; i<n; i++){
+
+            if((visited & (1<<i)) !=0 || w[idx][i]==0) continue;
+
+            int t = solve(i, visited|(1<<i));
+            if(t==Integer.MAX_VALUE) continue;
+            ans = Math.min(ans, t + w[idx][i]);
+        }
+        return dp[idx][visited] = ans;
+
+    }
+
+}

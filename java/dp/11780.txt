@@ -1,0 +1,112 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class Main {
+    public static int m,n;
+    public static int[][] visit;
+    public static long[][] dist;
+    public static LinkedList<Integer> t;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+
+        n = Integer.parseInt(br.readLine());
+        m = Integer.parseInt(br.readLine());
+        t = new LinkedList<>();
+
+
+        dist = new long[n + 1][n+1];
+        visit = new int[n+1][n+1];
+
+        for(int i=1; i<=n; i++){
+            for(int j=1; j<=n; j++){
+                dist[i][j] = Long.MAX_VALUE;
+            }
+        }
+
+        for(int i=1; i<=n; i++){
+            dist[i][i] = 0;
+        }
+
+        for (int i = 0; i < m; i++) {
+            String[] in = br.readLine().split(" ");
+            int u = Integer.parseInt(in[0]);
+            int v = Integer.parseInt(in[1]);
+            long w = Long.parseLong(in[2]);
+
+            dist[u][v] = Math.min(dist[u][v], w);
+        }
+
+        solve(dist);
+
+        for(int i=1; i<=n; i++){
+            for(int j=1; j<=n; j++){
+                if(dist[i][j]==Long.MAX_VALUE)
+                    bw.write("0 ");
+                else
+                    bw.write(dist[i][j]+" ");
+            }
+            bw.write("\n");
+        }
+
+
+        for(int i=1; i<=n; i++){
+            for(int j=1; j<=n; j++){
+
+                if(dist[i][j]==0 || dist[i][j] == Long.MAX_VALUE)
+                    bw.write("0\n");
+
+                else{
+                    t.clear();
+                    print(i,j);
+                    bw.write((t.size()+2)+" "+i+" ");
+
+                    for(int k: t){
+                        bw.write(k+" ");
+                    }
+                    bw.write(j+"\n");
+                }
+
+            }
+        }
+
+        bw.flush();
+
+    }
+
+    public static void solve(long[][] dist){
+
+        for(int k=1; k<=n; k++){
+
+            for(int i=1; i<=n; i++){
+
+                for(int j=1; j<=n; j++){
+                    if(dist[i][k]!=Long.MAX_VALUE && dist[k][j] != Long.MAX_VALUE) {
+                        if(dist[i][j]>dist[i][k]+dist[k][j]){
+                            dist[i][j] = dist[i][k] + dist[k][j];
+                            visit[i][j] = k;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    public static void print(int i, int j){
+
+        if(visit[i][j]==0||visit[i][j]==i||visit[i][j]==j)
+            return ;
+
+        print(i, visit[i][j]);
+        t.add(visit[i][j]);
+        print(visit[i][j], j);
+    }
+
+}

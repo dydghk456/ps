@@ -1,0 +1,105 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+public class Main {
+    public static int n, k, cnt, res_cnt,nt, num;
+    public static int[] count, scc;
+    public static LinkedList<Integer>[] d,rev ;
+    public static Stack<Integer> st;
+    public static boolean[] visited;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        nt = Integer.parseInt(br.readLine());
+
+        for(int z=0; z<nt;z++) {
+            String[] in = br.readLine().split(" ");
+
+            n = Integer.parseInt(in[0]);
+            k = Integer.parseInt(in[1]);
+            cnt = 0;
+            res_cnt = 0;
+            num = 0;
+
+            count = new int[n + 1];
+            visited = new boolean[n + 1];
+            st = new Stack<Integer>();
+            scc = new int[n + 1];
+            rev = new LinkedList[n+1];
+            d = new LinkedList[n + 1];
+            for (int i = 0; i <= n; i++) {
+                d[i] = new LinkedList<Integer>();
+                rev[i] = new LinkedList<Integer>();
+            }
+
+            for (int i = 0; i < k; i++) {
+                in = br.readLine().split(" ");
+                int a = Integer.parseInt(in[0]);
+                int b = Integer.parseInt(in[1]);
+                d[a].add(b);
+                rev[b].add(a);
+            }
+
+
+            for (int i = 1; i <= n; i++)
+                if (!visited[i])
+                    dfs(i);
+
+            bw.write(num+"\n");
+        }
+
+        bw.flush();
+
+
+    }
+
+    public static void solve(int idx) {
+
+    }
+    public static int dfs(int x) {
+        st.push(x);
+        count[x] = ++cnt;
+        int t = cnt;
+        visited[x] = true;
+
+        for(int v : d[x]){
+            if(!visited[v]) t = Math.min(t, dfs(v));
+            else if(scc[v]==0) t = Math.min(t, count[v]);
+        }
+
+        if(t==count[x]){
+            boolean connected = false;
+            LinkedList<Integer> temp = new LinkedList<Integer>();
+            res_cnt++;
+            while(!st.isEmpty()){
+                int tt = st.pop();
+                scc[tt] = res_cnt;
+                temp.add(tt);
+                if(tt == x) break;
+            }
+
+            while(!temp.isEmpty()){
+                int tt = temp.poll();
+
+                for(int ttt:rev[tt]){
+                    if(scc[ttt] != res_cnt){
+                        connected = true;
+                        break;
+                    }
+                }
+                if(connected) break;
+            }
+
+            if(!connected) num++;
+        }
+        return t;
+
+    }
+
+}

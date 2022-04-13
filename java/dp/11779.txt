@@ -1,0 +1,117 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class Main {
+    public static int m,n,v, f;
+    public static int[] visited;
+    public static LinkedList<Pair>[] d;
+    public static int[] dist;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in;
+
+        n = Integer.parseInt(br.readLine());
+        m = Integer.parseInt(br.readLine());
+
+        visited = new int[n+1];
+        d = new LinkedList[n+1];
+
+        for(int i=0; i<=n; i++) d[i] = (new LinkedList<Pair>());
+
+        dist = new int[n+1];
+
+        for(int i=1; i<=n; i++){
+            dist[i] = Integer.MAX_VALUE;
+        }
+
+        for(int i=0; i<m; i++){
+            in = br.readLine().split(" ");
+            int u = Integer.parseInt(in[0]);
+            int v = Integer.parseInt(in[1]);
+            int w = Integer.parseInt(in[2]);
+
+            d[u].add(new Pair(v,w));
+        }
+
+        in = br.readLine().split(" ");
+
+        v = Integer.parseInt(in[0]);
+        f = Integer.parseInt(in[1]);
+
+        dist[v] = 0;
+
+        solve(v);
+
+        int t = f;
+
+        LinkedList<Integer> tt = new LinkedList<Integer>();
+
+
+        while(t!=0){
+            tt.add(t);
+            t = visited[t];
+        }
+
+        bw.write(dist[f]+"\n");
+
+        bw.write(tt.size()+"\n");
+
+        while(!tt.isEmpty()){
+            bw.write(tt.removeLast()+" ");
+        }
+        bw.write("\n");
+
+        bw.flush();
+
+    }
+
+    public static void solve(int v){
+
+        PriorityQueue<Pair> q = new PriorityQueue<Pair>();
+        q.add(new Pair(v,0));
+
+        while(!q.isEmpty()){
+            Pair p = q.poll();
+
+            v = p.x;
+
+            if(v==f) break;
+
+            if(p.y>dist[v]) continue;
+
+            for(Pair x : d[v]){
+                int dest = x.x;
+                int l = x.y;
+
+                if(dist[dest]> dist[v]+l){
+                    visited[dest] = v;
+                    dist[dest] = dist[v] + l;
+                    q.add(new Pair(dest,dist[dest]));
+                }
+            }
+        }
+    }
+
+    public static class Pair implements Comparable<Pair>{
+        public final int x;
+        public final int y;
+
+        Pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public int compareTo(Pair pair){
+            return this.y - pair.y;
+        }
+    }
+
+
+}

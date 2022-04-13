@@ -1,0 +1,86 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class Main {
+    public static int n, idx = 0;
+    public static int[] arr, dt, id, ans;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] in;
+
+        n = Integer.parseInt(br.readLine());
+
+        in = br.readLine().split(" ");
+
+        dt = new int[n];
+        arr = new int[n+1];
+        id = new int[n];
+        ans = new int[n];
+
+        dt[0] = Integer.parseInt(in[0]);
+        arr[0] = dt[0];
+        id[0] = 0;
+
+        for(int i=1; i<n; i++){
+            dt[i] = Integer.parseInt(in[i]);
+
+            if(dt[i]>arr[idx]){
+                arr[++idx] = dt[i];
+                id[i] = idx;
+            }
+            else
+                solve(dt[i], i);
+        }
+
+        int loc = idx;
+
+
+        for(int i= n-1; i>=0 && loc>=0; i--){
+
+            if(id[i] == loc){
+                ans[loc--] = dt[i];
+            }
+        }
+
+
+        bw.write((idx+1)+"\n");
+
+        for(int i=0; i<= idx; i++)
+            bw.write(ans[i]+" ");
+
+        bw.write("\n");
+
+        bw.flush();
+
+    }
+
+    public static void solve(int l, int i) {
+
+        id[i] = low_bound(l);
+
+    }
+
+    public static int low_bound(int l){
+        int lo = 0;
+        int hi = idx;
+
+        while (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (arr[mid] >= l) {
+                hi = mid;
+            } else
+                lo = mid + 1;
+        }
+
+        arr[lo] = l;
+
+        return lo;
+    }
+
+}

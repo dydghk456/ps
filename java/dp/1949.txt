@@ -1,0 +1,114 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+class Node{
+    public int parent;
+    public int key;
+    public LinkedList<Integer> child;
+
+    Node(int parent, int key){
+        this.parent = parent;
+        this.key = key;
+        child = new LinkedList<Integer>();
+    }
+}
+
+
+public class Main {
+    public static int n;
+    public static boolean[] visited;
+    public static LinkedList<Integer>[] d;
+    public static Node root;
+    public static Node[] ns;
+    public static int[] w;
+    public static int[][] dp;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in;
+
+        n = Integer.parseInt(br.readLine());
+
+        visited = new boolean[n+1];
+        dp = new int[n+1][2];
+        d = new LinkedList[n+1];
+        ns = new Node[n+1];
+        w = new int[n+1];
+        for(int i=0; i<=n; i++)
+            d[i] = new LinkedList<Integer>();
+
+        for(int i=0; i<=n; i++)
+            for(int j=0; j<=1; j++)
+                dp[i][j] = -1;
+
+        in = br.readLine().split(" ");
+        for(int i=0; i<n; i++)
+            w[i+1] = Integer.parseInt(in[i]);
+
+        for(int i=0; i<n-1; i++){
+            in = br.readLine().split(" ");
+            int a = Integer.parseInt(in[0]);
+            int b = Integer.parseInt(in[1]);
+            d[a].add(b);
+            d[b].add(a);
+        }
+
+        root = new Node(-1, 1);
+        makeTree();
+        int ans = Math.max(solve(1,0), solve(1,1));
+
+        bw.write(ans+"\n");
+
+        bw.flush();
+
+
+    }
+
+    public static int solve(int k,int con){
+        if(dp[k][con]!=-1) return dp[k][con];
+        if(ns[k].child.isEmpty()) {
+            dp[k][0] = 0;
+            dp[k][1] = w[k];
+            return dp[k][con];
+        }
+
+        int ans = 0;
+        int ans1 = w[k];
+        for(int ck : ns[k].child){
+            ans += Math.max(solve(ck,1),solve(ck,0));
+            ans1 += solve(ck,0);
+        }
+        dp[k][0] = ans;
+        dp[k][1] = ans1;
+
+        return dp[k][con];
+
+    }
+
+    public static void makeTree(){
+        Queue<Node> q = new LinkedList<Node>();
+        q.add(root);
+
+        while(!q.isEmpty()){
+            Node i = q.poll();
+            int k = i.key;
+            ns[k] = i;
+            visited[k] = true;
+
+            for(int c : d[k]){
+                if(visited[c]) continue;
+
+                Node cc = new Node(k, c);
+                i.child.add(c);
+                q.add(cc);
+            }
+        }
+    }
+
+}

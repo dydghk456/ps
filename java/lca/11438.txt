@@ -1,0 +1,122 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+class Pair{
+    public int idx, depth;
+
+    Pair(int idx, int depth){
+        this.idx = idx;
+        this.depth = depth;
+    }
+}
+public class Main {
+    public static int n, k;
+    public static int[] depth, count;
+    public static int[][] parent;
+    public static LinkedList<Integer>[] d;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in;
+
+        n = Integer.parseInt(br.readLine());
+
+        int max = (int)Math.ceil(log2(n));
+        parent = new int[n+1][max];
+        depth = new int[n+1];
+        boolean[] visited = new boolean[n+1];
+        d = new LinkedList[n+1];
+        for(int i=0; i<=n; i++)
+            d[i] = new LinkedList<Integer>();
+
+        for(int i=0; i<n-1; i++){
+            in = br.readLine().split(" ");
+            int a = Integer.parseInt(in[0]);
+            int b = Integer.parseInt(in[1]);
+            d[a].add(b);
+            d[b].add(a);
+        }
+
+
+        Queue<Pair> q = new LinkedList<Pair>();
+        q.add(new Pair(1,0));
+
+        while(!q.isEmpty()){
+            Pair p = q.poll();
+            depth[p.idx] = p.depth;
+            visited[p.idx] = true;
+
+            for(int tt : d[p.idx]){
+                if(visited[tt]) continue;
+                q.add(new Pair(tt, depth[p.idx]+1));
+                parent[tt][0] = p.idx;
+            }
+        }
+
+        for(int i=1;i<max; i++){
+            for(int j=1; j<=n; j++){
+                parent[j][i] = parent[parent[j][i-1]][i-1];
+            }
+        }
+
+        k = Integer.parseInt(br.readLine());
+
+        for(int z=0; z<k; z++){
+
+            in = br.readLine().split(" ");
+            int c1 = Integer.parseInt(in[0]);
+            int c2 = Integer.parseInt(in[1]);
+
+            if(depth[c1]<depth[c2]){
+                int t = c1;
+                c1 = c2;
+                c2 = t;
+            }
+
+            int diff = depth[c1]-depth[c2];
+
+            for(int i=0; diff!=0; i++){
+                int t=diff%2;
+                if(t==1) c1 = parent[c1][i];
+                diff = diff/2;
+            }
+
+            for(int i=max-1; i>=0; i--){
+                if(parent[c1][i]==0||parent[c1][i]==parent[c2][i]){
+                    continue;
+                }
+                if(parent[c1][i]!=parent[c2][i]){
+                    c1 = parent[c1][i];
+                    c2 = parent[c2][i];
+                }
+
+            }
+            if(c1!=c2)
+                c1 = parent[c1][0];
+
+            bw.write(c1+"\n");
+        }
+
+        bw.flush();
+
+
+    }
+
+    public static void solve(int idx) {
+
+    }
+    public static double log2(int x) {
+
+        return Math.log10(x) / Math.log10(2);
+
+    }
+
+
+}

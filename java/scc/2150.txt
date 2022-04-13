@@ -1,0 +1,113 @@
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+class Pair{
+    public int idx, parent;
+
+    Pair(int idx, int parent){
+        this.idx = idx;
+        this.parent = parent;
+    }
+}
+
+class list_compare implements Comparator<LinkedList<Integer>>{
+    @Override
+    public int compare(LinkedList<Integer> a, LinkedList<Integer> b){
+        if(a.get(0)>b.get(0)) return 1;
+        else if(a.get(0).equals(b.get(0))) return 0;
+        else return -1;
+    }
+}
+
+
+public class Main {
+    public static int n, k, cnt, res_cnt;
+    public static int[] count, scc;
+    public static LinkedList<Integer>[] d;
+    public static LinkedList<LinkedList<Integer>> ans;
+    public static Stack<Integer> st;
+    public static boolean[] visited;
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] in= br.readLine().split(" ");
+
+        n = Integer.parseInt(in[0]);
+        k = Integer.parseInt(in[1]);
+
+        count = new int[n+1];
+        visited = new boolean[n+1];
+        st = new Stack<Integer>();
+        scc = new int[n+1];
+        ans = new LinkedList<LinkedList<Integer>>();
+        d = new LinkedList[n+1];
+        for(int i=0; i<=n; i++)
+            d[i] = new LinkedList<Integer>();
+
+        for(int i=0; i<k; i++){
+            in = br.readLine().split(" ");
+            int a = Integer.parseInt(in[0]);
+            int b = Integer.parseInt(in[1]);
+            d[a].add(b);
+        }
+
+
+        for(int i=1; i<=n; i++)
+            if(!visited[i])
+                dfs(i);
+
+        Collections.sort(ans, new list_compare());
+
+        bw.write(res_cnt+"\n");
+        for(int i=0; i<res_cnt; i++){
+            for(int tt : ans.get(i)){
+                bw.write(tt+" ");
+            }
+            bw.write("-1\n");
+        }
+
+        bw.flush();
+
+
+    }
+
+    public static void solve(int idx) {
+
+    }
+    public static int dfs(int x) {
+        st.push(x);
+        count[x] = ++cnt;
+        int t = cnt;
+        visited[x] = true;
+
+        for(int v : d[x]){
+            if(!visited[v]) t = Math.min(t, dfs(v));
+            else if(scc[v]==0) t = Math.min(t, count[v]);
+        }
+
+        if(t==count[x]){
+            res_cnt++;
+            LinkedList<Integer> temp =new LinkedList<Integer>();
+            while(!st.isEmpty()){
+                int tt = st.pop();
+                scc[tt] = res_cnt;
+                temp.add(tt);
+                if(tt == x) break;
+            }
+
+            Collections.sort(temp);
+            ans.add(temp);
+
+        }
+        return t;
+
+    }
+
+}
