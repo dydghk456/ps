@@ -12,7 +12,7 @@ class Pair{
     Pair(int idx, int depth){
         this.idx = idx;
         this.depth = depth;
-    }
+f    }
 }
 public class Main {
     public static int n, k;
